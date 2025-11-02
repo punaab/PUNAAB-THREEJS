@@ -93,26 +93,30 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
             console.log('Context client:', (context as any)?.client);
             
             // Method 1: Try Ethereum provider
-            let walletAddr = await getWalletAddressFromProvider();
+            let walletAddr: string | Promise<string> | null = await getWalletAddressFromProvider();
             
             // Method 2: Try context paths if provider didn't work
             if (!walletAddr) {
-              walletAddr = (context as any)?.wallet?.address || 
-                           (context as any)?.client?.connectedAddress ||
-                           (context as any)?.client?.walletAddress ||
-                           (context as any)?.account?.address ||
-                           null;
+              const contextWalletAddr = (context as any)?.wallet?.address || 
+                                       (context as any)?.client?.connectedAddress ||
+                                       (context as any)?.client?.walletAddress ||
+                                       (context as any)?.account?.address ||
+                                       null;
+              walletAddr = contextWalletAddr;
             }
             
             console.log('Wallet address found:', walletAddr);
             
-            // Ensure it's a string, not a Promise
-            if (walletAddr && typeof walletAddr === 'string') {
+            // Handle wallet address - check if it's a Promise or string
+            if (!walletAddr) {
+              console.warn('No wallet address found in context');
+              setWalletAddress(null);
+            } else if (typeof walletAddr === 'string') {
               setWalletAddress(walletAddr);
               console.log('Wallet address set:', walletAddr);
-            } else if (walletAddr && typeof walletAddr.then === 'function') {
+            } else if (walletAddr && typeof (walletAddr as any).then === 'function') {
               // If it's a Promise, await it
-              walletAddr.then((addr: string) => {
+              (walletAddr as Promise<string>).then((addr: string) => {
                 if (typeof addr === 'string') {
                   setWalletAddress(addr);
                   console.log('Wallet address set from promise:', addr);
@@ -122,7 +126,7 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
                 setWalletAddress(null);
               });
             } else {
-              console.warn('No wallet address found in context');
+              console.warn('Wallet address is not a valid string or Promise');
               setWalletAddress(null);
             }
           } catch (err) {
@@ -186,26 +190,30 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
               console.log('Context client (signIn):', (context as any)?.client);
               
               // Method 1: Try Ethereum provider
-              let walletAddr = await getWalletAddressFromProvider();
+              let walletAddr: string | Promise<string> | null = await getWalletAddressFromProvider();
               
               // Method 2: Try context paths if provider didn't work
               if (!walletAddr) {
-                walletAddr = (context as any)?.wallet?.address || 
-                             (context as any)?.client?.connectedAddress ||
-                             (context as any)?.client?.walletAddress ||
-                             (context as any)?.account?.address ||
-                             null;
+                const contextWalletAddr = (context as any)?.wallet?.address || 
+                                         (context as any)?.client?.connectedAddress ||
+                                         (context as any)?.client?.walletAddress ||
+                                         (context as any)?.account?.address ||
+                                         null;
+                walletAddr = contextWalletAddr;
               }
               
               console.log('Wallet address found (signIn):', walletAddr);
               
-              // Ensure it's a string, not a Promise
-              if (walletAddr && typeof walletAddr === 'string') {
+              // Handle wallet address - check if it's a Promise or string
+              if (!walletAddr) {
+                console.warn('No wallet address found in context (signIn)');
+                setWalletAddress(null);
+              } else if (typeof walletAddr === 'string') {
                 setWalletAddress(walletAddr);
                 console.log('Wallet address set (signIn):', walletAddr);
-              } else if (walletAddr && typeof walletAddr.then === 'function') {
+              } else if (walletAddr && typeof (walletAddr as any).then === 'function') {
                 // If it's a Promise, await it
-                walletAddr.then((addr: string) => {
+                (walletAddr as Promise<string>).then((addr: string) => {
                   if (typeof addr === 'string') {
                     setWalletAddress(addr);
                     console.log('Wallet address set from promise (signIn):', addr);
@@ -215,7 +223,7 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
                   setWalletAddress(null);
                 });
               } else {
-                console.warn('No wallet address found in context (signIn)');
+                console.warn('Wallet address is not a valid string or Promise (signIn)');
                 setWalletAddress(null);
               }
             } catch (err) {
