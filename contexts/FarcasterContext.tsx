@@ -34,8 +34,11 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
         // Wait for SDK to be ready
         await sdk.actions.ready();
         
+        // Get context - it may be a Promise, so await it
+        const context = await (sdk.context instanceof Promise ? sdk.context : Promise.resolve(sdk.context));
+        
         // Check if user is already authenticated via context
-        const currentUser = sdk.context?.user;
+        const currentUser = context?.user;
         if (currentUser) {
           // Safely convert values to strings, handling edge cases
           const username = currentUser.username 
@@ -59,8 +62,8 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
           
           // Try to get wallet address - ensure it's a string, not a Promise
           try {
-            const walletAddr = (sdk.context as any)?.wallet?.address || 
-                             (sdk.context as any)?.client?.connectedAddress || 
+            const walletAddr = (context as any)?.wallet?.address || 
+                             (context as any)?.client?.connectedAddress || 
                              null;
             // Ensure it's a string, not a Promise
             if (walletAddr && typeof walletAddr === 'string') {
@@ -104,8 +107,11 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
       const { token } = await quickAuth.getToken();
       
       if (token) {
+        // Get context - it may be a Promise, so await it
+        const context = await (sdk.context instanceof Promise ? sdk.context : Promise.resolve(sdk.context));
+        
         // After getting token, user info should be available in context
-        const currentUser = sdk.context?.user;
+        const currentUser = context?.user;
         if (currentUser) {
           // Safely convert values to strings, handling edge cases
           const username = currentUser.username 
@@ -129,8 +135,8 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
           
           // Try to get wallet address - ensure it's a string, not a Promise
           try {
-            const walletAddr = (sdk.context as any)?.wallet?.address || 
-                             (sdk.context as any)?.client?.connectedAddress || 
+            const walletAddr = (context as any)?.wallet?.address || 
+                             (context as any)?.client?.connectedAddress || 
                              null;
             // Ensure it's a string, not a Promise
             if (walletAddr && typeof walletAddr === 'string') {
