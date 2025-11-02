@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 const OPENSEA_API_BASE = 'https://api.opensea.io/api/v2';
 const OPENSEA_WARPLETS_COLLECTION = 'the-warplets-farcaster';
 
