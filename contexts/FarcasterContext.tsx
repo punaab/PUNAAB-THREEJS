@@ -14,6 +14,7 @@ interface FarcasterContextType {
   user: FarcasterUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  walletAddress: string | null;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -24,6 +25,7 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<FarcasterUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
 
   useEffect(() => {
     // Initialize SDK and check authentication status
@@ -54,6 +56,32 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
             pfpUrl: typeof currentUser.pfpUrl === 'string' ? currentUser.pfpUrl : undefined,
           });
           setIsAuthenticated(true);
+          
+          // Try to get wallet address - ensure it's a string, not a Promise
+          try {
+            const walletAddr = (sdk.context as any)?.wallet?.address || 
+                             (sdk.context as any)?.client?.connectedAddress || 
+                             null;
+            // Ensure it's a string, not a Promise
+            if (walletAddr && typeof walletAddr === 'string') {
+              setWalletAddress(walletAddr);
+            } else if (walletAddr && typeof walletAddr.then === 'function') {
+              // If it's a Promise, await it
+              walletAddr.then((addr: string) => {
+                if (typeof addr === 'string') {
+                  setWalletAddress(addr);
+                }
+              }).catch(() => {
+                // If wallet address fetch fails, continue without it
+                setWalletAddress(null);
+              });
+            } else {
+              setWalletAddress(null);
+            }
+          } catch (err) {
+            console.error('Error getting wallet address:', err);
+            setWalletAddress(null);
+          }
         }
       } catch (error) {
         console.error('Failed to initialize Farcaster SDK:', error);
@@ -98,6 +126,32 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
             pfpUrl: typeof currentUser.pfpUrl === 'string' ? currentUser.pfpUrl : undefined,
           });
           setIsAuthenticated(true);
+          
+          // Try to get wallet address - ensure it's a string, not a Promise
+          try {
+            const walletAddr = (sdk.context as any)?.wallet?.address || 
+                             (sdk.context as any)?.client?.connectedAddress || 
+                             null;
+            // Ensure it's a string, not a Promise
+            if (walletAddr && typeof walletAddr === 'string') {
+              setWalletAddress(walletAddr);
+            } else if (walletAddr && typeof walletAddr.then === 'function') {
+              // If it's a Promise, await it
+              walletAddr.then((addr: string) => {
+                if (typeof addr === 'string') {
+                  setWalletAddress(addr);
+                }
+              }).catch(() => {
+                // If wallet address fetch fails, continue without it
+                setWalletAddress(null);
+              });
+            } else {
+              setWalletAddress(null);
+            }
+          } catch (err) {
+            console.error('Error getting wallet address:', err);
+            setWalletAddress(null);
+          }
         }
       }
     } catch (error: any) {
@@ -117,6 +171,7 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
       // Clear local state
       setUser(null);
       setIsAuthenticated(false);
+      setWalletAddress(null);
       // Note: The SDK doesn't have a signOut method, so we just clear local state
     } catch (error) {
       console.error('Sign out failed:', error);
@@ -129,6 +184,7 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
         user,
         isAuthenticated,
         isLoading,
+        walletAddress,
         signIn,
         signOut,
       }}
@@ -145,4 +201,3 @@ export function useFarcaster() {
   }
   return context;
 }
-

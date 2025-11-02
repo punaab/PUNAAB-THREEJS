@@ -1,13 +1,13 @@
 {
   "miniapp": {
     "version": "1",
-    "name": "Farcaster Mini App",
-    "description": "A Farcaster mini app with Three.js integration",
+    "name": "The Warplets Music",
+    "description": "Generate music NFTs for your Warplets using AI",
     "iconUrl": "https://your-domain.com/icon.png",
     "homeUrl": "https://your-domain.com",
     "canonicalDomain": "your-domain.com",
     "requiredChains": ["eip155:8453"],
-    "tags": ["miniapp", "threejs"],
+    "tags": ["miniapp", "music", "nft", "ai"],
     "requiredCapabilities": [
       "actions.ready",
       "actions.signIn"
