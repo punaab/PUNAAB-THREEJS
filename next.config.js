@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Ensure .well-known files are served correctly
+  // Ensure .well-known files are served correctly from public directory
   async headers() {
     return [
       {
