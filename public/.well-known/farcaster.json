@@ -2,15 +2,16 @@
   "miniapp": {
     "version": "1",
     "name": "The Warplets Music",
-    "description": "Generate music NFTs for your Warplets using AI",
-    "iconUrl": "https://your-domain.com/icon.png",
-    "homeUrl": "https://your-domain.com",
-    "canonicalDomain": "your-domain.com",
+    "description": "Generate music NFTs for your Warplets",
+    "iconUrl": "https://punaab-threejs-7se8.vercel.app/icon.png",
+    "homeUrl": "https://punaab-threejs-7se8.vercel.app",
+    "canonicalDomain": "punaab-threejs-7se8.vercel.app",
     "requiredChains": ["eip155:8453"],
     "tags": ["miniapp", "music", "nft", "ai"],
     "requiredCapabilities": [
       "actions.ready",
-      "actions.signIn"
+      "actions.signIn",
+      "wallet.getEthereumProvider"
     ]
   }
 }

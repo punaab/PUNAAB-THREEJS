@@ -18,7 +18,7 @@ interface Warplet {
 }
 
 export default function Home() {
-  const { isAuthenticated } = useFarcaster();
+  const { isAuthenticated, walletAddress } = useFarcaster();
   const router = useRouter();
   const [selectedWarplet, setSelectedWarplet] = useState<Warplet | null>(null);
   const [showQuestions, setShowQuestions] = useState(false);
@@ -94,6 +94,13 @@ export default function Home() {
 
         <div className="bg-black/40 backdrop-blur-sm rounded-lg p-6 mb-6 border border-purple-500/30">
           <h2 className="text-2xl font-semibold text-white mb-4">Select Your Warplet</h2>
+          {/* Debug info - remove in production */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mb-4 p-3 bg-gray-800/50 rounded text-xs text-gray-400">
+              <p>Debug: Authenticated: {isAuthenticated ? 'Yes' : 'No'}</p>
+              <p>Debug: Wallet: {walletAddress || 'Not set'}</p>
+            </div>
+          )}
           <WarpletSelector
             onSelect={setSelectedWarplet}
             selectedWarplet={selectedWarplet}

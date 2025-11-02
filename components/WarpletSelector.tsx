@@ -23,32 +23,50 @@ export default function WarpletSelector({ onSelect, selectedWarplet }: WarpletSe
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('WarpletSelector useEffect - isAuthenticated:', isAuthenticated, 'walletAddress:', walletAddress);
+    
     if (isAuthenticated && walletAddress) {
       // Ensure walletAddress is a string, not a Promise
       const address = typeof walletAddress === 'string' ? walletAddress : null;
       if (address) {
+        console.log('Fetching Warplets for address:', address);
         fetchWarplets(address);
+      } else {
+        console.warn('Wallet address is not a string:', typeof walletAddress, walletAddress);
       }
+    } else {
+      console.log('Not fetching Warplets - isAuthenticated:', isAuthenticated, 'walletAddress:', walletAddress);
     }
   }, [isAuthenticated, walletAddress]);
 
   const fetchWarplets = async (address: string) => {
-    if (!address || typeof address !== 'string') return;
+    if (!address || typeof address !== 'string') {
+      console.error('Invalid address provided to fetchWarplets:', address);
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/opensea/user-nfts?wallet=${encodeURIComponent(address)}`);
+      const apiUrl = `/api/opensea/user-nfts?wallet=${encodeURIComponent(address)}`;
+      console.log('Fetching Warplets from:', apiUrl);
+      
+      const response = await fetch(apiUrl);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch Warplets');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('API error response:', errorData);
+        throw new Error(errorData.error || 'Failed to fetch Warplets');
       }
 
       const data = await response.json();
+      console.log('Warplets data received:', data);
+      console.log('Number of NFTs:', data.nfts?.length || 0);
       setWarplets(data.nfts || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load Warplets');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load Warplets';
+      setError(errorMessage);
       console.error('Error fetching Warplets:', err);
     } finally {
       setIsLoading(false);
@@ -86,10 +104,13 @@ export default function WarpletSelector({ onSelect, selectedWarplet }: WarpletSe
     );
   }
 
-  if (warplets.length === 0) {
+  if (warplets.length === 0 && !isLoading && !error) {
     return (
       <div className="text-center py-12">
         <p className="text-gray-400 mb-4">No Warplets found in your wallet</p>
+        {walletAddress && (
+          <p className="text-xs text-gray-500 mb-4">Wallet: {typeof walletAddress === 'string' ? walletAddress : 'Not available'}</p>
+        )}
         <a
           href="https://opensea.io/collection/the-warplets-farcaster"
           target="_blank"

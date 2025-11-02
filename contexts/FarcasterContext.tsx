@@ -27,6 +27,31 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [walletAddress, setWalletAddress] = useState<string | null>(null);
 
+  // Function to get wallet address from Ethereum provider
+  const getWalletAddressFromProvider = async () => {
+    try {
+      // Check if wallet provider capability is available
+      if (sdk.wallet?.getEthereumProvider) {
+        const provider = await sdk.wallet.getEthereumProvider();
+        if (provider && provider.request) {
+          const accounts = await provider.request({ method: 'eth_accounts' });
+          if (accounts && accounts.length > 0) {
+            return accounts[0];
+          }
+          // Try requesting accounts if not already connected
+          const requestedAccounts = await provider.request({ method: 'eth_requestAccounts' });
+          if (requestedAccounts && requestedAccounts.length > 0) {
+            return requestedAccounts[0];
+          }
+        }
+      }
+      return null;
+    } catch (error) {
+      console.error('Error getting wallet from provider:', error);
+      return null;
+    }
+  };
+
   useEffect(() => {
     // Initialize SDK and check authentication status
     const initSDK = async () => {
@@ -60,25 +85,44 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
           });
           setIsAuthenticated(true);
           
-          // Try to get wallet address - ensure it's a string, not a Promise
+          // Try to get wallet address - multiple methods
           try {
-            const walletAddr = (context as any)?.wallet?.address || 
-                             (context as any)?.client?.connectedAddress || 
-                             null;
+            // Log context structure for debugging
+            console.log('Farcaster context:', context);
+            console.log('Context wallet:', (context as any)?.wallet);
+            console.log('Context client:', (context as any)?.client);
+            
+            // Method 1: Try Ethereum provider
+            let walletAddr = await getWalletAddressFromProvider();
+            
+            // Method 2: Try context paths if provider didn't work
+            if (!walletAddr) {
+              walletAddr = (context as any)?.wallet?.address || 
+                           (context as any)?.client?.connectedAddress ||
+                           (context as any)?.client?.walletAddress ||
+                           (context as any)?.account?.address ||
+                           null;
+            }
+            
+            console.log('Wallet address found:', walletAddr);
+            
             // Ensure it's a string, not a Promise
             if (walletAddr && typeof walletAddr === 'string') {
               setWalletAddress(walletAddr);
+              console.log('Wallet address set:', walletAddr);
             } else if (walletAddr && typeof walletAddr.then === 'function') {
               // If it's a Promise, await it
               walletAddr.then((addr: string) => {
                 if (typeof addr === 'string') {
                   setWalletAddress(addr);
+                  console.log('Wallet address set from promise:', addr);
                 }
               }).catch(() => {
                 // If wallet address fetch fails, continue without it
                 setWalletAddress(null);
               });
             } else {
+              console.warn('No wallet address found in context');
               setWalletAddress(null);
             }
           } catch (err) {
@@ -104,61 +148,92 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
       
       // Use Quick Auth to get a token
       // Note: This will only work when running inside a Farcaster client
-      const { token } = await quickAuth.getToken();
-      
-      if (token) {
-        // Get context - it may be a Promise, so await it
-        const context = await (sdk.context instanceof Promise ? sdk.context : Promise.resolve(sdk.context));
+      try {
+        const { token } = await quickAuth.getToken();
         
-        // After getting token, user info should be available in context
-        const currentUser = context?.user;
-        if (currentUser) {
-          // Safely convert values to strings, handling edge cases
-          const username = currentUser.username 
-            ? (typeof currentUser.username === 'string' 
-                ? currentUser.username 
-                : String(currentUser.username || ''))
-            : '';
-          const displayName = currentUser.displayName 
-            ? (typeof currentUser.displayName === 'string' 
-                ? currentUser.displayName 
-                : String(currentUser.displayName || ''))
-            : '';
+        if (token) {
+          // Get context - it may be a Promise, so await it
+          const context = await (sdk.context instanceof Promise ? sdk.context : Promise.resolve(sdk.context));
           
-          setUser({
-            fid: currentUser.fid,
-            username: username || '',
-            displayName: displayName || 'User',
-            pfpUrl: typeof currentUser.pfpUrl === 'string' ? currentUser.pfpUrl : undefined,
-          });
-          setIsAuthenticated(true);
-          
-          // Try to get wallet address - ensure it's a string, not a Promise
-          try {
-            const walletAddr = (context as any)?.wallet?.address || 
-                             (context as any)?.client?.connectedAddress || 
+          // After getting token, user info should be available in context
+          const currentUser = context?.user;
+          if (currentUser) {
+            // Safely convert values to strings, handling edge cases
+            const username = currentUser.username 
+              ? (typeof currentUser.username === 'string' 
+                  ? currentUser.username 
+                  : String(currentUser.username || ''))
+              : '';
+            const displayName = currentUser.displayName 
+              ? (typeof currentUser.displayName === 'string' 
+                  ? currentUser.displayName 
+                  : String(currentUser.displayName || ''))
+              : '';
+            
+            setUser({
+              fid: currentUser.fid,
+              username: username || '',
+              displayName: displayName || 'User',
+              pfpUrl: typeof currentUser.pfpUrl === 'string' ? currentUser.pfpUrl : undefined,
+            });
+            setIsAuthenticated(true);
+            
+            // Try to get wallet address - ensure it's a string, not a Promise
+            try {
+              // Log context structure for debugging
+              console.log('Farcaster context (signIn):', context);
+              console.log('Context wallet (signIn):', (context as any)?.wallet);
+              console.log('Context client (signIn):', (context as any)?.client);
+              
+              // Method 1: Try Ethereum provider
+              let walletAddr = await getWalletAddressFromProvider();
+              
+              // Method 2: Try context paths if provider didn't work
+              if (!walletAddr) {
+                walletAddr = (context as any)?.wallet?.address || 
+                             (context as any)?.client?.connectedAddress ||
+                             (context as any)?.client?.walletAddress ||
+                             (context as any)?.account?.address ||
                              null;
-            // Ensure it's a string, not a Promise
-            if (walletAddr && typeof walletAddr === 'string') {
-              setWalletAddress(walletAddr);
-            } else if (walletAddr && typeof walletAddr.then === 'function') {
-              // If it's a Promise, await it
-              walletAddr.then((addr: string) => {
-                if (typeof addr === 'string') {
-                  setWalletAddress(addr);
-                }
-              }).catch(() => {
-                // If wallet address fetch fails, continue without it
+              }
+              
+              console.log('Wallet address found (signIn):', walletAddr);
+              
+              // Ensure it's a string, not a Promise
+              if (walletAddr && typeof walletAddr === 'string') {
+                setWalletAddress(walletAddr);
+                console.log('Wallet address set (signIn):', walletAddr);
+              } else if (walletAddr && typeof walletAddr.then === 'function') {
+                // If it's a Promise, await it
+                walletAddr.then((addr: string) => {
+                  if (typeof addr === 'string') {
+                    setWalletAddress(addr);
+                    console.log('Wallet address set from promise (signIn):', addr);
+                  }
+                }).catch(() => {
+                  // If wallet address fetch fails, continue without it
+                  setWalletAddress(null);
+                });
+              } else {
+                console.warn('No wallet address found in context (signIn)');
                 setWalletAddress(null);
-              });
-            } else {
+              }
+            } catch (err) {
+              console.error('Error getting wallet address (signIn):', err);
               setWalletAddress(null);
             }
-          } catch (err) {
-            console.error('Error getting wallet address:', err);
-            setWalletAddress(null);
           }
         }
+      } catch (authError: any) {
+        // Handle Farcaster client not available gracefully
+        if (authError?.message?.includes('result') || 
+            authError?.message?.includes('undefined') ||
+            authError?.code === 'ECONNREFUSED') {
+          console.warn('Farcaster authentication requires running within a Farcaster client. The app will work in development mode.');
+          // Don't throw - gracefully handle the case where Farcaster client is not available
+          return;
+        }
+        throw authError; // Re-throw other errors
       }
     } catch (error: any) {
       console.error('Sign in failed:', error);
