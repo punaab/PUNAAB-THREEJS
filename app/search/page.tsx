@@ -74,9 +74,11 @@ export default function SearchPage() {
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-8 flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-white">Search Music</h1>
-          <UserProfile />
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">Search Music</h1>
+          <div className="flex justify-center">
+            <UserProfile />
+          </div>
         </header>
 
         <div className="bg-black/40 backdrop-blur-sm rounded-lg p-6 mb-6 border border-purple-500/30">

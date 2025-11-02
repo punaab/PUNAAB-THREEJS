@@ -51,9 +51,11 @@ export default function Home() {
     return (
       <main className="min-h-screen p-8">
         <div className="max-w-6xl mx-auto">
-          <header className="mb-8 flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-white">The Warplets Music</h1>
-            <AuthButton />
+          <header className="mb-8 text-center">
+            <h1 className="text-4xl font-bold text-white mb-4">The Warplets Music</h1>
+            <div className="flex justify-center">
+              <AuthButton />
+            </div>
           </header>
           <div className="bg-black/40 backdrop-blur-sm rounded-lg p-12 text-center border border-purple-500/30">
             <h2 className="text-2xl font-semibold text-white mb-4">Welcome</h2>
@@ -71,9 +73,11 @@ export default function Home() {
     return (
       <main className="min-h-screen p-8">
         <div className="max-w-6xl mx-auto">
-          <header className="mb-8 flex justify-between items-center">
-            <h1 className="text-4xl font-bold text-white">The Warplets Music</h1>
-            <UserProfile />
+          <header className="mb-8 text-center">
+            <h1 className="text-4xl font-bold text-white mb-4">The Warplets Music</h1>
+            <div className="flex justify-center">
+              <UserProfile />
+            </div>
           </header>
           <QuestionFlow
             onComplete={handleQuestionComplete}
@@ -87,9 +91,11 @@ export default function Home() {
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-8 flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-white">The Warplets Music</h1>
-          <UserProfile />
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">The Warplets Music</h1>
+          <div className="flex justify-center">
+            <UserProfile />
+          </div>
         </header>
 
         <div className="bg-black/40 backdrop-blur-sm rounded-lg p-6 mb-6 border border-purple-500/30">

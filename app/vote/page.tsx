@@ -70,9 +70,11 @@ export default function VotePage() {
   return (
     <main className="min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-8 flex justify-between items-center">
-          <h1 className="text-4xl font-bold text-white">Vote</h1>
-          <UserProfile />
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold text-white mb-4">Vote</h1>
+          <div className="flex justify-center">
+            <UserProfile />
+          </div>
         </header>
 
         {isLoading ? (

@@ -7,7 +7,7 @@
     "homeUrl": "https://punaab-threejs-7se8.vercel.app",
     "canonicalDomain": "punaab-threejs-7se8.vercel.app",
     "requiredChains": ["eip155:8453"],
-    "tags": ["miniapp", "music", "nft", "ai"],
+    "tags": ["miniapp", "music", "nft", "ai", "warplets"],
     "requiredCapabilities": [
       "actions.ready",
       "actions.signIn",
