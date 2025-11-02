@@ -1,0 +1,17 @@
+{
+  "miniapp": {
+    "version": "1",
+    "name": "Farcaster Mini App",
+    "description": "A Farcaster mini app with Three.js integration",
+    "iconUrl": "https://your-domain.com/icon.png",
+    "homeUrl": "https://your-domain.com",
+    "canonicalDomain": "your-domain.com",
+    "requiredChains": ["eip155:8453"],
+    "tags": ["miniapp", "threejs"],
+    "requiredCapabilities": [
+      "actions.ready",
+      "actions.signIn"
+    ]
+  }
+}
+
