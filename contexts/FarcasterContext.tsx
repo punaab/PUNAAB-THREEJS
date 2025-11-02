@@ -44,12 +44,12 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
           const username = currentUser.username 
             ? (typeof currentUser.username === 'string' 
                 ? currentUser.username 
-                : (currentUser.username?.toString?.() || ''))
+                : String(currentUser.username || ''))
             : '';
           const displayName = currentUser.displayName 
             ? (typeof currentUser.displayName === 'string' 
                 ? currentUser.displayName 
-                : (currentUser.displayName?.toString?.() || ''))
+                : String(currentUser.displayName || ''))
             : '';
           
           setUser({
@@ -117,12 +117,12 @@ export function FarcasterProvider({ children }: { children: ReactNode }) {
           const username = currentUser.username 
             ? (typeof currentUser.username === 'string' 
                 ? currentUser.username 
-                : (currentUser.username?.toString?.() || ''))
+                : String(currentUser.username || ''))
             : '';
           const displayName = currentUser.displayName 
             ? (typeof currentUser.displayName === 'string' 
                 ? currentUser.displayName 
-                : (currentUser.displayName?.toString?.() || ''))
+                : String(currentUser.displayName || ''))
             : '';
           
           setUser({
